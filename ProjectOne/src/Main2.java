@@ -173,7 +173,7 @@ public class Main2 {
 						if(charArr[j] >= '0' && charArr[j] <= '9') {
 							temp += charArr[j];
 							j++;
-						}else if(charArr[j] == '.' && ((j+1) <= charArr.length) && period == false && E == false){
+						}else if(charArr[j] == '.' && ((j+1) < charArr.length) && period == false && E == false){
 							//if the next char is a period, and could be followed by a digit
 							//...check if the period is followed by a digit...if so, float
 							if(charArr[j+1] >= '0' && charArr[j+1] <= '9') {
@@ -183,13 +183,16 @@ public class Main2 {
 								whileCheck = false;
 							}
 							period = true;
-						}else if(E == false && charArr[j] == 'E' && ((j+1) <= charArr.length)) {
-							if((charArr[j + 1] == '+' || charArr[j+1] == '-') && ((j+1) < charArr.length)) {
+						}else if(E == false && charArr[j] == 'E' && ((j+1) < charArr.length)) {
+							//System.out.println("---------------------------charArr[] " + c);
+							if((charArr[j + 1] == '+' || charArr[j+1] == '-') && ((j+2) < charArr.length)) {
 								//check if next is digit; add if true;
 								if(charArr[j+2] >= '0' && charArr[j+2] <= '9') {
+									temp += charArr[j];
 									temp += charArr[j+1];
 									temp += charArr[j+2];
-									j+=2;
+									j+=3;
+									//System.out.println("---------------------------Temp: " + temp + " C: " + c + " J+1: " + charArr[j+1] /* + " J+2: " + charArr[j+2]*/);
 								}else {
 									whileCheck = false;
 								}
