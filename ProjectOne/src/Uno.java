@@ -2,7 +2,7 @@
 public class Uno {
 
 	public static boolean check(char c) {
-		char[] idUno = {'*', '+', '-', ';', '.', '(', ')', '{', '}', '[', ']'};
+		char[] idUno = {'*', '+', '-', ';', '.', '(', ')', '{', '}', '[', ']', '/', ','};
 		for(int i = 0; i < idUno.length; i++) {
 			if(idUno[i] == c) {
 				return true;
@@ -12,7 +12,7 @@ public class Uno {
 	}
 	
 	public static boolean dos(char c) {
-		char[] idUno = {'<', '>', '+'};
+		char[] idUno = {'<', '>', '='};
 		for(int i = 0; i < idUno.length; i++) {
 			if(idUno[i] == c) {
 				return true;
@@ -26,6 +26,9 @@ public class Uno {
 		char[] dos = {'=', '=', '='};
 		for(int i = 0; i < idUno.length; i++) {
 			if((idUno[i] == c) && (idUno[i] == d)) {
+				return true;
+			}
+			if(idUno[i] == c) {
 				return true;
 			}
 		}

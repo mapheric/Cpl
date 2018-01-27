@@ -16,15 +16,16 @@ public class Main2 {
 		List<String> lines = new ArrayList<String>();
 		List<String> letters = new ArrayList<String>();
 		List<String> store = new ArrayList<String>();
+		List<String> name = new ArrayList<String>();
 		CheckComments comments = new CheckComments();
 		CheckKeywords keywords = new CheckKeywords();
 		CheckSymbols symbols = new CheckSymbols();
 		Letters l = new Letters();
 		Digits d = new Digits();
 		Uno uno = new Uno();
+		What what = new What();
 		//Iterator itr = letters.iterator();
 		//ListIterator<String> itr = letters.listIterator();
-		
 		
 		//variables and such
 		char c;
@@ -36,18 +37,22 @@ public class Main2 {
 		boolean entered = false;
 		boolean whileCheck = false;
 		boolean slashCheck = false;
+		boolean E = false;
+		boolean period = false;
+		String str = "";
+		String str2 = "";
 		String temp = "";
 		char aChar = ' ';
 		char[] idUno = {'*', '+', '-', ';', '.', '(', ')', '{', '}', '[', ']'};
 		
-		System.out.println("----------------------------------------------------------------------------------------------------------------------");
-		System.out.println("i    j    last    c    Word                              Tokens  in Line                                                  ");
-		System.out.println("----------------------------------------------------------------------------------------------------------------------");
+		//System.out.println("----------------------------------------------------------------------------------------------------------------------");
+		//System.out.println("i    j    last    c    Word                              Tokens  in Line                                                  ");
+		//System.out.println("----------------------------------------------------------------------------------------------------------------------");
 		
 		//get file data
 		Scanner file = null;
 		try {
-			file = new Scanner(new File("text.txt"));
+			file = new Scanner(new File("texxt2.txt"));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -63,7 +68,7 @@ public class Main2 {
 		//for loop for finding tokens
 		for(int i = 0; i<arr.length; i++) {
 			System.out.println("INPUT: " + arr[i].toString());
-			
+			 
 //			if(count == 0) {
 //				last = ' ';
 //			}
@@ -102,6 +107,8 @@ public class Main2 {
 						letters.add(temp);
 						temp = "";
 						last = ' ';
+						name.add("Symbol    ");
+						System.out.println("------------------------------hmmmmm");
 					}
 					
 				}
@@ -146,6 +153,11 @@ public class Main2 {
 					}
 					temp += ' ';
 					letters.add(temp);
+					if(what.check(temp)){
+						name.add("Keyword   ");
+					}else {
+						name.add("ID        ");
+					}
 					//System.out.println("Words " + temp);
 					temp = "";
 					j--;
@@ -154,25 +166,68 @@ public class Main2 {
 					
 				}else if(Character.isDigit(c) && count == 0) {
 					//cycle through all the numbers that make up a term; store somewhere
+					E = false;
+					period = false;
 					whileCheck = true;
 					while(j < charArr.length && whileCheck == true) {
 						if(charArr[j] >= '0' && charArr[j] <= '9') {
 							temp += charArr[j];
 							j++;
-						}else {
+						}else if(charArr[j] == '.' && ((j+1) <= charArr.length) && period == false && E == false){
+							//if the next char is a period, and could be followed by a digit
+							//...check if the period is followed by a digit...if so, float
+							if(charArr[j+1] >= '0' && charArr[j+1] <= '9') {
+								temp += charArr[j];
+								j++;
+							}else {
+								whileCheck = false;
+							}
+							period = true;
+						}else if(E == false && charArr[j] == 'E' && ((j+1) <= charArr.length)) {
+							if((charArr[j + 1] == '+' || charArr[j+1] == '-') && ((j+1) < charArr.length)) {
+								//check if next is digit; add if true;
+								if(charArr[j+2] >= '0' && charArr[j+2] <= '9') {
+									temp += charArr[j+1];
+									temp += charArr[j+2];
+									j+=2;
+								}else {
+									whileCheck = false;
+								}
+							}else if(charArr[j+1] >= '0' && charArr[j+1] <= '9') {
+								//add E if next is digit
+								temp += charArr[j];
+								j++;
+							}
+							E = true;
+						}
+						else {
 							whileCheck = false;
 						}
-					}
-					temp += ' ';
+					}//end numcheck while loop
+					//temp += ' ';
+					boolean czec = false;
 					letters.add(temp);
+					int m = 0;
+					while(m<temp.length() && czec == false) {
+						//System.out.println("--------------------------Inside..Temp: " + temp);
+						if(temp.charAt(m) == '.' || temp.charAt(m) == 'E') {
+							name.add("FLOAT     ");
+							czec = true;
+						}else if((m == temp.length() -1) && czec == false) {
+							name.add("NUM       ");
+						}
+						m++;
+					}
+					//name.add("NUM       ");
 					temp = "";
-					j--;				
+					j--;	//because while loop doesn't exit until j is incremented to a false num			
 				}else if(last == '/' && c != '*' && count == 0 && badSlash == false){					
 					//if last is a slash, and next isn't a comment start, then '/' is a division sign
 						temp = "";
 						temp += last;
-						temp +=  ' ';
+						//temp +=  ' ';
 						letters.add(temp);
+						name.add("Symbol    ");
 						j--;
 				}
 //				else if(count == 0 && c != ' ' && !(Character.isDigit(c)) && !(c >= 'a' && c <= 'z')){
@@ -193,50 +248,72 @@ public class Main2 {
 						temp = "";
 						temp += ' ';
 						letters.add(temp);
+						name.add("Whitespace");
 					}else if(count == 0 && c == ' ' && last == ' ') {		//add whitespace to demark for future parsing
 						//no need for multiple whitespaces, do nothing..
 						//although I could strip them out later...
-					}else if(uno.check(c) && count == 0) {			//if singular symbol, add to array
+					}
+					
+					else if(uno.check(c) && count == 0) {			//if singular symbol, add to array
 						temp = "";
 						temp += c;
-						temp += ' ';
+						//temp += ' ';
 						letters.add(temp);
+						name.add("Symbol    ");
 						temp = "";
 					}else if(uno.dos(c) && j == (charArr.length - 1) && count == 0) {	//only 1 symbol if at end
 						temp = "";
 						temp += c;
-						temp += ' ';
+						//temp += ' ';
 						letters.add(temp);
+						name.add("Symbol    ");
 						temp = "";
 					}else if((uno.dos(c) && j < (charArr.length - 1) && count == 0) || (c == '!' && count == 0 && j < (charArr.length - 1))) {
 						//could be compound symbol
-						
 						if(c == '!' && charArr[j + 1] == '=') {
-							temp = "!= ";
+							temp = "!=";
+							j+=2;
+							letters.add(temp);
+							name.add("Symbol    ");
+							temp = "";
+						}else if(c == '!' && count == 0 && charArr[j+1] != '=') {
+							temp = "!";
 							j++;
 							letters.add(temp);
+							name.add("Error     ");
+							temp = "";
 						}else if(uno.tres(c, charArr[j+1])) {
 							temp = "";
 							temp += c;
 							temp += charArr[j +1];
-							temp += ' ';
+							//temp += ' ';
 							letters.add(temp);
+							name.add("Symbol    ");
 							temp = "";
 							j++;
-						}else {
-							temp = "";
-							temp += c;
-							temp += ' ';
-							letters.add(temp);
-							temp = "";
 						}
+//						else {
+//							temp = "";
+//							temp += c;
+//							//temp += ' ';
+//							letters.add(temp);
+//							name.add("Error - inside");
+//							temp = "";
+//						}
+					}else if(c == '!' && j == charArr.length) {
+						temp = "!";
+						j++;
+						letters.add(temp);
+						name.add("Error     ");
+						temp = "";
 					}
 					else if(count == 0){
 						//System.out.println("IN STATEMENT. c: " + c + "--- COUNT: " + count + " Last: " + last);
 						temp = "";
 						temp += c;
-						temp += ' ';
+						//temp += ' ';
 						letters.add(temp);
+						name.add("Error     ");
 						temp = "";
 					}
 					
@@ -260,14 +337,26 @@ public class Main2 {
 			
 			//System.out.print("-------- Length of Array: " + letters.size() + ". ");
 			ListIterator<String> itr = letters.listIterator();
-			if(count == 0 && !(letters.isEmpty())) {System.out.print("TOKENS: ");
-			while(itr.hasNext()) {
-				System.out.print(itr.next());
+			ListIterator<String> nameItr = name.listIterator();
+			if(count == 0 && !(letters.isEmpty()) && itr.hasNext()) { //System.out.println("TOKENS:==" + itr.nextIndex());
+			while(itr.hasNext() && nameItr.hasNext()) {
+				str = (itr.next()).replaceAll("\\s","");
+				str2 = nameItr.next();
+				//System.out.println("```````````````````String is:" + str + "``````");
+				if(str != "" && str2 != "Whitespace" && !(str.isEmpty())) {
+					System.out.println("-----" + str2 + ": " + str);
+					//System.out.println(nameItr + " " + itr.next());
+					//System.out.println(str);
+				}
+				
+				//System.out.print(itr.next());				
 			}
 			//System.out.print("LENGTH == " + letters.size());
-			System.out.println("");
+			//System.out.println("");
 			store.addAll(letters);//add the contents of 'letters' array, for storage
 			letters.clear();
+			name.clear();
+			if(str2 != "Whitespace") {System.out.println();}
 			}
 			
 			if(count == 0) {last = ' ';}//delimiter to demark end of line
